@@ -215,4 +215,85 @@ This setup provides a robust solution for managing sensitive properties, offerin
 ----------------------------------------------------------------------------------------------------------------------------------
 
 
+package EncDec;
+
+import javax.crypto.Cipher;
+import javax.crypto.spec.SecretKeySpec;
+import java.util.Base64;
+
+/*
+ * spring.datasource.url=jdbc:mysql://localhost:3306/myapptest
+ * spring.datasource.username=${DB_USERNAME}
+ * spring.datasource.password=${DB_PASSWORD}
+ */
+
+
+
+/*
+ * public class EncryptionUtil { private static final String AES = "AES";
+ * private static final String SECRET_KEY = "ThisIsASecretKey"; // This should
+ * be stored securely, not hardcoded here
+ * 
+ * public static String encrypt(String strToEncrypt) { try { SecretKeySpec
+ * secretKey = new SecretKeySpec(SECRET_KEY.getBytes(), AES); Cipher cipher =
+ * Cipher.getInstance(AES); cipher.init(Cipher.ENCRYPT_MODE, secretKey); byte[]
+ * encryptedBytes = cipher.doFinal(strToEncrypt.getBytes()); return
+ * Base64.getEncoder().encodeToString(encryptedBytes); } catch (Exception e) {
+ * e.printStackTrace(); } return null; }
+ * 
+ * public static String decrypt(String strToDecrypt) { try { SecretKeySpec
+ * secretKey = new SecretKeySpec(SECRET_KEY.getBytes(), AES); Cipher cipher =
+ * Cipher.getInstance(AES); cipher.init(Cipher.DECRYPT_MODE, secretKey); byte[]
+ * decryptedBytes = cipher.doFinal(Base64.getDecoder().decode(strToDecrypt));
+ * return new String(decryptedBytes); } catch (Exception e) {
+ * e.printStackTrace(); } return null; }
+ * 
+ * public static void main(String[] args) { String originalPassword =
+ * "myPassword123"; String encryptedPassword = encrypt(originalPassword);
+ * System.out.println("Encrypted Password: " + encryptedPassword);
+ * 
+ * String decryptedPassword = decrypt(encryptedPassword);
+ * System.out.println("Decrypted Password: " + decryptedPassword); } }
+ */
+
+
+
+
+
+
+//========================================================================================
+
+
+
+//import com.amazonaws.services.secretsmanager.AWSSecretsManager;
+//import com.amazonaws.services.secretsmanager.AWSSecretsManagerClientBuilder;
+//import com.amazonaws.services.secretsmanager.model.GetSecretValueRequest;
+//import com.amazonaws.services.secretsmanager.model.GetSecretValueResult;
+//
+//public class AWSSecretsManagerExample {
+//
+//    public static void main(String[] args) {
+//        String secretName = "myAppSecret";
+//        String region = "your-aws-region"; // e.g., "us-east-1"
+//
+//        AWSSecretsManager client = AWSSecretsManagerClientBuilder.standard()
+//                                .withRegion(region)
+//                                .build();
+//
+//        GetSecretValueRequest request = new GetSecretValueRequest()
+//                                            .withSecretId(secretName);
+//
+//        GetSecretValueResult result = client.getSecretValue(request);
+//
+//        // Extract the secret values
+//        String username = result.getSecretString(); // Extract username
+//        // Parse JSON or extract password as needed from result.getSecretString()
+//
+//        System.out.println("Username: " + username);
+//        // Use the retrieved username and password in your application
+//    }
+//}
+//
+//
+//
 
