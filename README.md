@@ -396,3 +396,107 @@ public class MyController {
 This approach involves creating a custom property source that intercepts property retrieval and decrypts values when properties prefixed with {cipher} are encountered. Replace the decrypt method with your actual decryption logic using javax.crypto or any other encryption library.
 
 This method provides flexibility in handling encrypted properties by decrypting them at the time of access within the Spring environment.
+
+
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+Certainly! Apart from the mentioned methods, another way to handle sensitive information in Spring Boot applications is through the use of encrypted properties files and a decryption mechanism during application startup.
+
+Encrypted Properties Files with Decryption Mechanism
+1. Encrypt Sensitive Properties
+Encrypt the sensitive properties in a properties file using a chosen encryption method or tool.
+
+2. Create a Decryption Mechanism
+Implement a decryption mechanism to read the encrypted properties file and decrypt its contents during application startup.
+
+java
+Copy code
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.stereotype.Component;
+
+import java.io.InputStream;
+import java.util.Properties;
+
+@Component
+public class PropertyDecryptor {
+
+    public Properties decryptProperties() {
+        Properties properties = new Properties();
+        try {
+            ClassPathResource resource = new ClassPathResource("encrypted.properties"); // Encrypted properties file
+            InputStream inputStream = resource.getInputStream();
+
+            // Decrypt the contents of the encrypted properties file
+            // Implement your decryption logic here
+            // Read the decrypted content into the properties object
+
+            // For example, using javax.crypto to decrypt the file
+            // Decrypt the inputStream and load properties
+            // Example decryption:
+            // Cipher cipher = Cipher.getInstance("AES/ECB/PKCS5Padding");
+            // cipher.init(Cipher.DECRYPT_MODE, secretKey);
+            // CipherInputStream cipherInputStream = new CipherInputStream(inputStream, cipher);
+            // properties.load(cipherInputStream);
+
+            // Close the input stream after decryption
+            inputStream.close();
+        } catch (Exception e) {
+            // Handle decryption exception
+        }
+        return properties;
+    }
+}
+3. Use Decrypted Properties in Spring Beans
+In your Spring components, inject the decrypted properties using the decryption mechanism:
+
+java
+Copy code
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+
+@Component
+public class MyComponent {
+
+    @Value("${myapp.username}")
+    private String username;
+
+    @Value("${myapp.password}")
+    private String password;
+
+    // Use username and password in your component
+}
+4. Decrypt Properties During Application Startup
+During the application's initialization or within a @Configuration class, invoke the decryption mechanism to retrieve and inject decrypted properties into the Spring environment:
+
+java
+Copy code
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.Environment;
+
+import java.util.Properties;
+
+@Configuration
+public class AppConfig {
+
+    private final Environment environment;
+    private final PropertyDecryptor propertyDecryptor;
+
+    @Autowired
+    public AppConfig(Environment environment, PropertyDecryptor propertyDecryptor) {
+        this.environment = environment;
+        this.propertyDecryptor = propertyDecryptor;
+        loadDecryptedProperties();
+    }
+
+    private void loadDecryptedProperties() {
+        Properties decryptedProperties = propertyDecryptor.decryptProperties();
+        // Convert the decrypted properties to a map and add them to the environment
+        decryptedProperties.forEach((key, value) -> environment.getPropertySources().addFirst(new DecryptablePropertySource(key.toString(), value.toString())));
+    }
+}
+Replace the decryption logic within the PropertyDecryptor class with the appropriate decryption method based on how your properties are encrypted.
+
+This method involves decrypting the encrypted properties file during application startup and injecting the decrypted properties into the Spring environment, allowing their usage throughout the application.
