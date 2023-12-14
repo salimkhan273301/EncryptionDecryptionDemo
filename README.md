@@ -297,3 +297,102 @@ import java.util.Base64;
 //
 //
 
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+
+Certainly! Besides the previously mentioned approaches like Jasypt, Spring Cloud Config with Vault, or using @ConfigurationProperties, there's another method to handle encrypted properties in Spring Boot by using the javax.crypto package directly in combination with a custom property source.
+
+Custom Property Source with Encryption
+You can create a custom property source that decrypts encrypted properties during application startup.
+
+1. Encrypt Sensitive Properties
+Encrypt the sensitive properties manually or using a chosen encryption method.
+
+2. Create a Custom Property Source
+Create a class that implements Spring's PropertySource interface to handle decryption.
+
+java
+Copy code
+import org.springframework.core.env.PropertySource;
+
+public class EncryptedPropertySource extends PropertySource<String> {
+
+    private final PropertySource<String> propertySource;
+
+    public EncryptedPropertySource(PropertySource<String> propertySource) {
+        super("encryptedPropertySource");
+        this.propertySource = propertySource;
+    }
+
+    @Override
+    public Object getProperty(String name) {
+        Object value = propertySource.getProperty(name);
+        if (value instanceof String && ((String) value).startsWith("{cipher}")) {
+            String encryptedValue = ((String) value).substring(8); // Remove {cipher}
+            String decryptedValue = decrypt(encryptedValue); // Implement decryption logic
+            return decryptedValue;
+        }
+        return value;
+    }
+
+    // Implement your decryption logic here
+    private String decrypt(String encryptedValue) {
+        // Use javax.crypto or any other decryption mechanism
+        // Decrypt encryptedValue and return the decrypted string
+        return "DecryptedValue"; // Replace this with your decryption logic
+    }
+}
+3. Initialize the Custom Property Source
+During application startup, initialize this custom property source and add it to the Spring Environment.
+
+java
+Copy code
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.env.EnvironmentPostProcessor;
+import org.springframework.core.env.ConfigurableEnvironment;
+import org.springframework.core.env.PropertySource;
+import org.springframework.core.io.support.ResourcePropertySource;
+
+import java.io.IOException;
+
+public class EncryptedPropertyProcessor implements EnvironmentPostProcessor {
+
+    @Override
+    public void postProcessEnvironment(ConfigurableEnvironment environment, SpringApplication application) {
+        try {
+            ResourcePropertySource propertySource = new ResourcePropertySource("resource", "classpath:application.properties");
+            PropertySource<String> encryptedPropertySource = new EncryptedPropertySource(propertySource);
+            environment.getPropertySources().addFirst(encryptedPropertySource);
+        } catch (IOException e) {
+            // Handle IOException
+        }
+    }
+}
+4. Use Encrypted Properties in Your Application
+Now, in your application components, retrieve properties using the regular Environment injection.
+
+java
+Copy code
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+public class MyController {
+
+    @Value("${myapp.username}")
+    private String username;
+
+    @Value("${myapp.password}")
+    private String password;
+
+    @GetMapping("/credentials")
+    public String getCredentials() {
+        return "Username: " + username + ", Password: " + password;
+    }
+}
+This approach involves creating a custom property source that intercepts property retrieval and decrypts values when properties prefixed with {cipher} are encountered. Replace the decrypt method with your actual decryption logic using javax.crypto or any other encryption library.
+
+This method provides flexibility in handling encrypted properties by decrypting them at the time of access within the Spring environment.
