@@ -500,3 +500,52 @@ public class AppConfig {
 Replace the decryption logic within the PropertyDecryptor class with the appropriate decryption method based on how your properties are encrypted.
 
 This method involves decrypting the encrypted properties file during application startup and injecting the decrypted properties into the Spring environment, allowing their usage throughout the application.
+
+-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+import javax.crypto.Cipher;
+import javax.crypto.spec.SecretKeySpec;
+import java.util.Base64;
+
+public class EncryptionUtil {
+
+    private static final String SECRET_KEY = "YourSecretKey"; // Replace with your secret key
+
+    public static String encrypt(String password) {
+        try {
+            SecretKeySpec secretKeySpec = new SecretKeySpec(SECRET_KEY.getBytes(), "AES");
+            Cipher cipher = Cipher.getInstance("AES");
+            cipher.init(Cipher.ENCRYPT_MODE, secretKeySpec);
+            byte[] encryptedBytes = cipher.doFinal(password.getBytes());
+            return Base64.getEncoder().encodeToString(encryptedBytes);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public static String decrypt(String encryptedPassword) {
+        try {
+            SecretKeySpec secretKeySpec = new SecretKeySpec(SECRET_KEY.getBytes(), "AES");
+            Cipher cipher = Cipher.getInstance("AES");
+            cipher.init(Cipher.DECRYPT_MODE, secretKeySpec);
+            byte[] decryptedBytes = cipher.doFinal(Base64.getDecoder().decode(encryptedPassword));
+            return new String(decryptedBytes);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public static void main(String[] args) {
+        String originalPassword = "12345"; // Your original password
+        String encryptedPassword = encrypt(originalPassword);
+        System.out.println("Encrypted Password: " + encryptedPassword);
+
+        String decryptedPassword = decrypt(encryptedPassword);
+        System.out.println("Decrypted Password: " + decryptedPassword);
+    }
+}
+
+
